@@ -10,15 +10,20 @@ This repository serves a simple static website by
 - Ensure you have a functional AWS account to create Elastic Kubernetes Service (EKS).
 - A region to create your cluster.
 - Set up AWS CLI in your local machine by installing it from the official AWS CLI documentation.
-- Type the command "aws configure" and a prompt comes up to enter your AWS Access Key ID, Secret Access Key, default region, and default output format.
+- Type the command "aws configure" and a prompt comes up to enter your AWS Access Key ID, Secret Access Key, default region, and default output format. To get these values:
+    - Navigate to your console, to IAM and create first group in the "User groups" and add yourself as a "User" to the group. Assign the "User groups" the permissions necessary to create EKS. 
+    - For the purpose of this task, I had the "AdministratorAccess" because it is a personal account.
+    - But in an organizational settings, only permissions of least privileges will be assign by the IAM Administrator to "User groups" in order to be compliant with security measures.
+    - Next, go the "Users" section, click on the created user, navigate to "Security credentials" and "Create access key", choose "Command Line Interface (CLI)", type in a "Description tag value" and create the access key.
+    - Copy the "Access key" and "Secret access key" and configure your AWS CLI, you can also choose the default output format as "json".  
 ## optional
-- Create S3 bucket in the AWS for your backend terraform state files storage (Warning! It is highly recommended that you enable Object Versioning on the bucket to allow for state recovery in the case of accidental deletions and human error). 
-- Update this name in the bucket of 'providers.tf' file. If you wish not to store this, delete the terraform block on 'providers.tf' file.
+- Create S3 bucket in the AWS for your backend terraform state files storage (Warning! It is highly recommended that you enable Bucket Versioning on the bucket to allow for state recovery in the case of accidental deletions and human error). 
+- Update this name in the bucket of 'providers.tf' file. If you wish not to store this in cloud storage, delete the terraform block on 'providers.tf' file.
 
 # Terraform (Infrastruture setup)
 - Change directory into the "terraform" folder
 - Update the values of your terraform.tfvars and the backend storage bucket in providers.tf as appropriate from the created prerequisities.
-- Run "terraform init" to Initialize terraform and the modules.
+- Run "terraform init" to Initialize terraform, backend and the modules.
 - Run "terraform validate" to successfully validate your configurations.
 - Run "terraform plan" to plan your deployment and see the changes and deployments to be made.
 - Run "terraform apply" to setup your configurations in AWS.
@@ -41,7 +46,7 @@ This repository serves a simple static website by
 ## Helm Chart
 - The helm chart deploys the deployment.yaml, service.yaml and serviceaccount.yaml. The hpa.yaml and ingress.yaml were not enabled but are left customizable for you incase you wish to extend your deployments to include them.
 - This is a simple website that traffic is not expected on, so the replicaCount was left at 1. 
-- If you are not sure of expected traffic, it is advised to enable the hpa, so that the pods will be horizontally increased when there is traffic surge to your application. 
+- If you are not sure of expected traffic, it is advised to enable the hpa, so that the pods will be horizontally increased when there is traffic surge to your application (This is typical of a production-grade deployment) 
 - The website in this deployment case can be reached via the service of type LoadBalancer which is an external service type, but when Ingress is enabled, endeavour to change the service type to ClusterIP.
 - When you have an updated Docker image in any registry, you have to update these changes in the image section of values.yaml and also the appversion of chart.yaml.
 - The chart is left completely customizable so as to maintain consistency with any changes you make in the future.
